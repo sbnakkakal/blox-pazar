@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BloxPazar | Güvenli Roblox Dijital Pazar Yeri</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
+          colors: {
+            bloxdark: '#0a0d14',
+            bloxsurface: '#111726',
+            bloxcard: '#161f36',
+            bloxborder: '#232f4e',
+            bloxprimary: '#ef4444',
+            bloxblue: '#3b82f6',
+            bloxgreen: '#10b981',
+            bloxaccent: '#8b5cf6'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom glow effects and scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0a0d14;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #232f4e;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3b82f6;
+    }
+    .neon-border-red {
+      box-shadow: 0 0 15px -3px rgba(239, 68, 68, 0.35);
+    }
+    .neon-border-blue {
+      box-shadow: 0 0 20px -4px rgba(59, 130, 246, 0.4);
+    }
+    .glass-nav {
+      background: rgba(17, 23, 38, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+  </style>
+</head>
+<body class="bg-bloxdark text-slate-100 min-h-screen flex flex-col font-sans selection:bg-red-500 selection:text-white">
+
+  <header class="sticky top-0 z-40 border-b border-bloxborder glass-nav">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 sm:h-20 gap-3">
+        <!-- Logo -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="resetFilters()">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-600 via-rose-500 to-amber-500 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-red-500/20 ring-2 ring-red-400/30">
+            BP
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-xl sm:text-2xl font-extrabold tracking-tight text-white">Blox<span class="text-red-500">Pazar</span></span>
+              <span class="px-1.5 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded bg-red-500/10 text-red-400 border border-red-500/30">Roblox</span>
+            </div>
+            <p class="text-[10px] text-slate-400 hidden sm:block">Türkiye'nin #1 Roblox Escrow Pazaryeri</p>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="flex-1 max-w-md hidden md:block">
+          <div class="relative">
+            <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Robux, Kitsune Fruit, MM2 Godly veya hesap ara..."
+              class="w-full bg-bloxcard/70 border border-bloxborder rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all">
+          </div>
+        </div>
+
+        <!-- User Controls / Balance & Actions -->
+        <div class="flex items-center gap-2.5 sm:gap-4">
+          <!-- Balance Pill -->
+          <div class="flex items-center bg-bloxcard border border-bloxborder px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold">
+            <span class="text-slate-400 mr-2 flex items-center gap-1">
+              <i data-lucide="wallet" class="w-4 h-4 text-emerald-400"></i> Bakiye:
+            </span>
+            <span id="userBalanceText" class="text-emerald-400 font-mono font-bold tracking-tight">₺1,250.00</span>
+            <button onclick="addMockFunds()" title="Test Bakiyesi Ekle (+₺250)" class="ml-2 w-5 h-5 rounded-md bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-white flex items-center justify-center transition-colors">
+              +
+            </button>
+          </div>
+
+          <!-- Sell Button -->
+          <button onclick="openModal('createModal')" class="flex items-center gap-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-red-600/25 transition-all active:scale-95">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">İlan Ekle</span>
+          </button>
+
+          <!-- User Profile Mock -->
+          <div class="w-9 h-9 rounded-xl bg-bloxborder/60 border border-bloxborder flex items-center justify-center font-bold text-xs text-slate-300 ring-2 ring-transparent hover:ring-red-500/40 cursor-pointer">
+            RB
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Search Field -->
+      <div class="pb-3 md:hidden">
+        <div class="relative">
+          <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+          <input type="text" oninput="handleSearch(this.value)" placeholder="Roblox eşyası, hesap veya Robux ara..."
+            class="w-full bg-bloxcard/70 border border-bloxborder rounded-xl pl-10 pr-4 py-2 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-red-500">
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="border-b border-bloxborder bg-bloxsurface/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex items-center gap-2 overflow-x-auto pb-1 text-sm no-scrollbar" id="categoryTabs">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Escrow Banner Alert -->
+  <div class="bg-gradient-to-r from-blue-950/60 via-slate-900 to-purple-950/50 border-b border-bloxborder/60 px-4 py-2.5 text-xs text-slate-300">
+    <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="font-semibold text-emerald-400">BloxGuard Emanet (Escrow) Aktif:</span>
+        <span class="text-slate-300">Ödemeniz ürün Robloxta teslim edilip onaylanana kadar havuzda güvendedir!</span>
+      </div>
+      <div class="flex items-center gap-3 text-slate-400 text-[11px]">
+        <span>⚡ 7/24 Canlı Destek</span>
+        <span>🛡️ Sıfır Dolandırıcılık Garantisi</span>
+      </div>
+    </div>
+  </div>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    
+    <!-- Controls row: count, quick filters, sort -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2.5">
+          <span id="activeCategoryTitle">Tüm Roblox İlanları</span>
+          <span id="listingCountBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700 font-mono">0 İlan</span>
+        </h1>
+        <p class="text-xs text-slate-400 mt-1">Onaylı satıcılardan anında teslimatlı Roblox item ve bakiyeleri</p>
+      </div>
+
+      <div class="flex items-center gap-3 flex-wrap">
+        <!-- Quick Fast Delivery Toggle -->
+        <button id="fastDeliveryFilterBtn" onclick="toggleFastDeliveryFilter()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-bloxborder bg-bloxcard hover:border-amber-500/50 text-xs font-semibold text-slate-300 transition-all">
+          <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span>Hızlı Teslimat</span>
+        </button>
+
+        <!-- Sorting -->
+        <div class="relative">
+          <select id="sortSelect" onchange="handleSort(this.value)" class="bg-bloxcard border border-bloxborder rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-red-500 cursor-pointer">
+            <option value="featured">Öne Çıkanlar</option>
+            <option value="price_asc">Fiyat: Düşükten Yükseğe</option>
+            <option value="price_desc">Fiyat: Yüksekten Düşüğe</option>
+            <option value="rating">En Yüksek Satıcı Puanı</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Listings Grid -->
+    <div id="listingsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+      <!-- Cards rendered via JS -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center">
+      <div class="w-16 h-16 rounded-2xl bg-bloxcard border border-bloxborder flex items-center justify-center mb-4 text-slate-500">
+        <i data-lucide="package-x" class="w-8 h-8"></i>
+      </div>
+      <h3 class="text-lg font-bold text-slate-200">Aradığınız kritere uygun ilan bulunamadı</h3>
+      <p class="text-xs text-slate-400 mt-1 max-w-sm">Filtrelerinizi temizleyerek veya farklı bir arama yaparak tekrar deneyebilirsiniz.</p>
+      <button onclick="resetFilters()" class="mt-4 px-4 py-2 bg-red-600/20 text-red-400 border border-red-500/30 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white transition-all">
+        Filtreleri Sıfırla
+      </button>
+    </div>
+  </main>
+
+  <footer class="border-t border-bloxborder bg-bloxsurface mt-16 py-10 text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div class="space-y-3">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-red-600 flex items-center justify-center font-black text-sm text-white">BP</div>
+          <span class="text-base font-extrabold text-white">BloxPazar</span>
+        </div>
+        <p class="text-slate-400 leading-relaxed text-[11px]">
+          Roblox oyuncuları için bağımsız ve güvenli emanet havuzlu dijital pazar yeri. Roblox Corporation ile doğrudan bir bağı yoktur.
+        </p>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-slate-200 mb-3 uppercase tracking-wider text-[11px]">Kategoriler</h4>
+        <ul class="space-y-2 text-[11px]">
+          <li><a href="#" onclick="selectCategory('robux')" class="hover:text-red-400">Robux Satın Al</a></li>
+          <li><a href="#" onclick="selectCategory('fruits')" class="hover:text-red-400">Blox Fruits Eşyaları</a></li>
+          <li><a href="#" onclick="selectCategory('pets')" class="hover:text-red-400">Pet Sim 99 Titanic & Huge</a></li>
+          <li><a href="#" onclick="selectCategory('mm2')" class="hover:text-red-400">MM2 Godly Silahlar</a></li>
+          <li><a href="#" onclick="selectCategory('accounts')" class="hover:text-red-400">Eski / Nadir Roblox Hesapları</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-slate-200 mb-3 uppercase tracking-wider text-[11px]">Güvenlik & Escrow</h4>
+        <ul class="space-y-2 text-[11px]">
+          <li class="flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> %100 Emanet Havuz Sistemi</li>
+          <li class="flex items-center gap-1.5"><i data-lucide="clock" class="w-3.5 h-3.5 text-blue-400"></i> 24 Saat İtiraz Güvencesi</li>
+          <li class="flex items-center gap-1.5"><i data-lucide="user-check" class="w-3.5 h-3.5 text-purple-400"></i> Doğrulanmış Roblox Satıcıları</li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-slate-200 mb-3 uppercase tracking-wider text-[11px]">Test & Bilgi</h4>
+        <p class="text-[11px] text-slate-400 leading-relaxed">
+          Bu web sitesi tamamen etkileşimli bir simülasyondur. İlan ekleyebilir, arama yapabilir, bakiyenizle satın alma simülasyonu çalıştırabilir ve satıcıyla canlı sohbet edebilirsiniz.
+        </p>
+      </div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pt-4 border-t border-bloxborder/50 text-center text-slate-500 text-[10px]">
+      © 2026 BloxPazar. Tüm hakları saklıdır. Roblox, Roblox Corporation'ın tescilli ticari markasıdır.
+    </div>
+  </footer>
+
+  <div id="createModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-bloxcard border border-bloxborder rounded-2xl w-full max-w-lg p-6 relative shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-bloxborder">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center">
+            <i data-lucide="tag" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white">Yeni Roblox İlanı Ekle</h3>
+            <p class="text-xs text-slate-400">İlanınız anında pazaryerinde listelenir</p>
+          </div>
+        </div>
+        <button onclick="closeModal('createModal')" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-bloxsurface">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <form id="listingForm" onsubmit="handleCreateListing(event)" class="space-y-4 mt-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">İlan Başlığı</label>
+          <input type="text" id="newTitle" required placeholder="Örn: Blox Fruits - Perm Leopard Meyvesi"
+            class="w-full bg-bloxsurface border border-bloxborder rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-red-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Kategori</label>
+            <select id="newCategory" class="w-full bg-bloxsurface border border-bloxborder rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+              <option value="robux">Robux</option>
+              <option value="fruits">Blox Fruits</option>
+              <option value="pets">Pet Simulator 99</option>
+              <option value="mm2">Murder Mystery 2</option>
+              <option value="accounts">Roblox Hesabı</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Fiyat (TL)</label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">₺</span>
+              <input type="number" id="newPrice" step="0.5" required min="1" placeholder="150"
+                class="w-full bg-bloxsurface border border-bloxborder rounded-xl pl-7 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-red-500 font-mono">
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Satıcı Roblox Kullanıcı Adı</label>
+            <input type="text" id="newSeller" required placeholder="RobloxNickiniz"
+              class="w-full bg-bloxsurface border border-bloxborder rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-red-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Teslimat Türü</label>
+            <select id="newDelivery" class="w-full bg-bloxsurface border border-bloxborder rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+              <option value="Anında Teslimat">⚡ Anında (Otomatik Kod/Grup)</option>
+              <option value="15 Dakika">⚡ 15 Dakika İçinde</option>
+              <option value="1 Saat">🕒 1 Saat İçinde</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Öne Çıkan Özellik / Açıklama</label>
+          <input type="text" id="newBadge" placeholder="Örn: Level Max, 2x Drop Gamepass dahil"
+            class="w-full bg-bloxsurface border border-bloxborder rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-red-500">
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-[11px] text-slate-400 flex items-start gap-2">
+          <i data-lucide="info" class="w-4 h-4 text-blue-400 shrink-0 mt-0.5"></i>
+          <span>İlanınız yayınlandığında alıcı ödemesi havuzda saklanır. Oyun içi takas kanıtını teslim edince bakiyeniz hesabınıza aktarılır.</span>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-2">
+          <button type="button" onclick="closeModal('createModal')" class="px-4 py-2 text-xs text-slate-400 hover:text-white rounded-xl">Vazgeç</button>
+          <button type="submit" class="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs shadow-lg shadow-red-600/30 transition-all">İlanı Yayınla</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="buyModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-bloxcard border border-bloxborder rounded-2xl w-full max-w-lg p-6 relative shadow-2xl overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-bloxborder">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+          <h3 class="text-base font-bold text-white">Güvenli Emanet (Escrow) Alışverişi</h3>
+        </div>
+        <button onclick="closeModal('buyModal')" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-bloxsurface">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Item Snapshot in Modal -->
+      <div id="buyModalItemDetails" class="my-4 p-3.5 bg-bloxsurface rounded-xl border border-bloxborder flex items-center justify-between">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Escrow Mechanism Diagram -->
+      <div class="bg-blue-950/20 border border-blue-800/40 rounded-xl p-3 mb-4 text-xs text-slate-300">
+        <div class="flex items-center justify-between text-[11px] font-semibold text-blue-400 mb-2">
+          <span class="flex items-center gap-1"><i data-lucide="lock" class="w-3.5 h-3.5"></i> Havuz Koruması</span>
+          <span>BloxGuard v2.4</span>
+        </div>
+        <div class="grid grid-cols-3 gap-1.5 text-center text-[10px]">
+          <div class="p-2 rounded bg-slate-900/80 border border-slate-800">
+            <span class="text-white font-bold block">1. Bakiye Bloke</span>
+            Paranız havuzda tutulur
+          </div>
+          <div class="p-2 rounded bg-slate-900/80 border border-slate-800">
+            <span class="text-white font-bold block">2. Teslimat</span>
+            Roblox takası yapılır
+          </div>
+          <div class="p-2 rounded bg-slate-900/80 border border-slate-800">
+            <span class="text-white font-bold block">3. Onay</span>
+            Onaylayınca satıcıya geçer
+          </div>
+        </div>
+      </div>
+
+      <!-- Buyer Form -->
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Roblox Kullanıcı Adınız (Teslimat İçin Zorunlu)</label>
+          <div class="relative">
+            <i data-lucide="user" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+            <input type="text" id="buyerRobloxUser" placeholder="Roblox kullanıcı adınızı yazın..."
+              class="w-full bg-bloxsurface border border-bloxborder rounded-xl pl-10 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-red-500">
+          </div>
+          <p class="text-[10px] text-slate-400 mt-1">Satıcı sizi Roblox arkadaşı olarak ekleyip takası başlatacaktır.</p>
+        </div>
+
+        <div class="pt-2 border-t border-bloxborder flex items-center justify-between">
+          <div>
+            <div class="text-[11px] text-slate-400">Ödenecek Tutar:</div>
+            <div id="buyModalPriceTag" class="text-xl font-black text-emerald-400 font-mono">₺0.00</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="closeModal('buyModal')" class="px-3.5 py-2 text-xs text-slate-400 hover:text-white rounded-xl">İptal</button>
+            <button id="confirmPurchaseBtn" onclick="executePurchase()" class="flex items-center gap-1.5 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs shadow-lg shadow-emerald-600/30 transition-all">
+              <i data-lucide="shield-check" class="w-4 h-4"></i>
+              <span>Havuzlu Satın Al</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="chatDrawer" class="fixed bottom-4 right-4 z-50 w-full max-w-sm bg-bloxcard border border-bloxborder rounded-2xl shadow-2xl overflow-hidden hidden flex-col transition-all">
+    <!-- Header -->
+    <div class="bg-bloxsurface px-4 py-3 border-b border-bloxborder flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="relative">
+          <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center font-bold text-xs text-white" id="chatSellerAvatar">
+            S
+          </div>
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-bloxsurface absolute bottom-0 right-0"></span>
+        </div>
+        <div>
+          <h4 class="text-xs font-bold text-white flex items-center gap-1">
+            <span id="chatSellerName">Satıcı</span>
+            <span class="text-[9px] px-1 py-0.2 bg-blue-500/20 text-blue-300 rounded font-mono">Sipariş #BX-849</span>
+          </h4>
+          <p class="text-[10px] text-emerald-400">Canlı Sipariş Odası</p>
+        </div>
+      </div>
+      <button onclick="toggleChatDrawer(false)" class="text-slate-400 hover:text-white p-1 rounded-md">
+        <i data-lucide="minus" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <!-- Message Body -->
+    <div id="chatMessages" class="p-3 h-64 overflow-y-auto space-y-2 text-xs bg-bloxdark/50">
+      <!-- Injected via JS -->
+    </div>
+
+    <!-- Actions / Release Escrow -->
+    <div class="p-2 bg-bloxsurface/80 border-t border-bloxborder">
+      <div class="flex items-center justify-between mb-2 px-1">
+        <span class="text-[10px] text-slate-400">Eşyayı Robloxta teslim aldınız mı?</span>
+        <button onclick="confirmDeliveryEscrow()" class="text-[10px] font-bold text-emerald-400 hover:underline">Siparişi Onayla</button>
+      </div>
+      <div class="flex gap-1.5">
+        <input type="text" id="chatInput" placeholder="Satıcıya mesaj gönder..." onkeydown="if(event.key==='Enter') sendChatMessage()"
+          class="flex-1 bg-bloxcard border border-bloxborder rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-red-500">
+        <button onclick="sendChatMessage()" class="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold">
+          <i data-lucide="send" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Center -->
+  <div id="toast" class="fixed top-5 right-5 z-50 hidden items-center gap-2.5 px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold border transition-all"></div>
+
+  <script>
+    // State Management
+    let userBalance = 1250.00;
+    let selectedCategory = 'all';
+    let searchQuery = '';
+    let filterFastDelivery = false;
+    let currentSort = 'featured';
+    let activeBuyingItem = null;
+
+    // Categories
+    const categories = [
+      { id: 'all', name: 'Tümü', icon: 'layers' },
+      { id: 'robux', name: 'Robux', icon: 'coins' },
+      { id: 'fruits', name: 'Blox Fruits', icon: 'sword' },
+      { id: 'pets', name: 'Pet Sim 99', icon: 'cat' },
+      { id: 'mm2', name: 'Murder Mystery 2', icon: 'skull' },
+      { id: 'accounts', name: 'Hesaplar', icon: 'shield' },
+    ];
+
+    // Initial Mock Listings
+    let listings = [
+      {
+        id: 1,
+        title: '1,000 Robux (Grup Fonu & Vergi Kesintisiz)',
+        category: 'robux',
+        price: 249.90,
+        seller: 'RobuxMerkezi',
+        sellerRating: 4.9,
+        sellerSales: 1420,
+        verified: true,
+        fastDelivery: true,
+        deliveryTime: 'Anında Teslimat',
+        badge: 'Grup Fonu Aktif',
+        image: '🪙',
+        bgGradient: 'from-amber-500/20 to-yellow-600/10'
+      },
+      {
+        id: 2,
+        title: 'Blox Fruits - Permanent Kitsune Fruit',
+        category: 'fruits',
+        price: 890.00,
+        seller: 'BloxDealerTR',
+        sellerRating: 5.0,
+        sellerSales: 630,
+        verified: true,
+        fastDelivery: true,
+        deliveryTime: '5 Dakika',
+        badge: 'Kalıcı (Perm)',
+        image: '🦊',
+        bgGradient: 'from-purple-600/20 to-indigo-600/10'
+      },
+      {
+        id: 3,
+        title: 'PS99 - Huge Holographic Cat (Gökkuşağı)',
+        category: 'pets',
+        price: 340.00,
+        seller: 'PetMaster99',
+        sellerRating: 4.8,
+        sellerSales: 310,
+        verified: false,
+        fastDelivery: true,
+        deliveryTime: '10 Dakika',
+        badge: 'Nadir Seri',
+        image: '🐱',
+        bgGradient: 'from-pink-500/20 to-rose-600/10'
+      },
+      {
+        id: 4,
+        title: 'MM2 - Harvester Gun & Bat Knife Seti',
+        category: 'mm2',
+        price: 475.00,
+        seller: 'NikilisTrader',
+        sellerRating: 4.9,
+        sellerSales: 890,
+        verified: true,
+        fastDelivery: true,
+        deliveryTime: 'Anında Teslimat',
+        badge: 'Ancient Godly',
+        image: '🏹',
+        bgGradient: 'from-emerald-500/20 to-teal-600/10'
+      },
+      {
+        id: 5,
+        title: '2016 Kuruluşlu Roblox Hesabı (Korblox & Headless)',
+        category: 'accounts',
+        price: 1850.00,
+        seller: 'OldRobloxian',
+        sellerRating: 4.7,
+        sellerSales: 112,
+        verified: true,
+        fastDelivery: false,
+        deliveryTime: '1 Saat',
+        badge: 'İlk Mail Dahil',
+        image: '👑',
+        bgGradient: 'from-blue-600/20 to-cyan-600/10'
+      },
+      {
+        id: 6,
+        title: 'Blox Fruits - Perm Dragon (Yeniden Yapım)',
+        category: 'fruits',
+        price: 1150.00,
+        seller: 'BloxDealerTR',
+        sellerRating: 5.0,
+        sellerSales: 630,
+        verified: true,
+        fastDelivery: true,
+        deliveryTime: 'Anında Teslimat',
+        badge: 'Mitik',
+        image: '🐉',
+        bgGradient: 'from-red-600/20 to-orange-600/10'
+      },
+      {
+        id: 7,
+        title: '2,500 Robux Gamepass Satın Alımı',
+        category: 'robux',
+        price: 575.00,
+        seller: 'VipRobuxcu',
+        sellerRating: 4.6,
+        sellerSales: 450,
+        verified: false,
+        fastDelivery: false,
+        deliveryTime: '15 Dakika',
+        badge: '%100 Güvenli',
+        image: '💎',
+        bgGradient: 'from-amber-600/20 to-yellow-500/10'
+      },
+      {
+        id: 8,
+        title: 'MM2 - Chroma Candleflame Godly',
+        category: 'mm2',
+        price: 290.00,
+        seller: 'NikilisTrader',
+        sellerRating: 4.9,
+        sellerSales: 890,
+        verified: true,
+        fastDelivery: true,
+        deliveryTime: 'Anında Teslimat',
+        badge: 'Chroma Renk',
+        image: '🕯️',
+        bgGradient: 'from-purple-500/20 to-pink-600/10'
+      }
+    ];
+
+    function initCategories() {
+      const container = document.getElementById('categoryTabs');
+      container.innerHTML = categories.map(cat => `
+        <button onclick="selectCategory('${cat.id}')" 
+          class="category-tab px-3.5 py-1.5 rounded-xl font-semibold text-xs whitespace-nowrap flex items-center gap-2 transition-all ${
+            selectedCategory === cat.id 
+              ? 'bg-red-600 text-white shadow-md shadow-red-600/30' 
+              : 'bg-bloxcard text-slate-300 hover:bg-bloxcard/80 border border-bloxborder'
+          }">
+          <i data-lucide="${cat.icon}" class="w-3.5 h-3.5"></i>
+          <span>${cat.name}</span>
+        </button>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function selectCategory(catId) {
+      selectedCategory = catId;
+      const catObj = categories.find(c => c.id === catId);
+      document.getElementById('activeCategoryTitle').innerText = catId === 'all' ? 'Tüm Roblox İlanları' : catObj.name + ' İlanları';
+      initCategories();
+      renderListings();
+    }
+
+    function getFilteredListings() {
+      return listings.filter(item => {
+        // Category filter
+        if (selectedCategory !== 'all' && item.category !== selectedCategory) return false;
+
+        // Search query
+        if (searchQuery.trim() !== '') {
+          const q = searchQuery.toLowerCase();
+          const matchTitle = item.title.toLowerCase().includes(q);
+          const matchSeller = item.seller.toLowerCase().includes(q);
+          const matchBadge = item.badge.toLowerCase().includes(q);
+          if (!matchTitle && !matchSeller && !matchBadge) return false;
+        }
+
+        // Fast delivery
+        if (filterFastDelivery && !item.fastDelivery) return false;
+
+        return true;
+      }).sort((a, b) => {
+        if (currentSort === 'price_asc') return a.price - b.price;
+        if (currentSort === 'price_desc') return b.price - a.price;
+        if (currentSort === 'rating') return b.sellerRating - a.sellerRating;
+        return b.id - a.id; // featured / newest
+      });
+    }
+
+    function renderListings() {
+      const filtered = getFilteredListings();
+      const grid = document.getElementById('listingsGrid');
+      const empty = document.getElementById('emptyState');
+      const badge = document.getElementById('listingCountBadge');
+
+      badge.innerText = `${filtered.length} İlan`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        empty.classList.remove('hidden');
+        empty.classList.add('flex');
+        return;
+      }
+
+      empty.classList.add('hidden');
+      empty.classList.remove('flex');
+
+      grid.innerHTML = filtered.map(item => `
+        <div class="bg-bloxcard border border-bloxborder rounded-2xl overflow-hidden hover:border-slate-500/60 transition-all duration-200 flex flex-col group hover:-translate-y-1 hover:shadow-xl hover:shadow-black/40">
+          
+          <!-- Card Header / Image / Emoji -->
+          <div class="h-32 w-full bg-gradient-to-br ${item.bgGradient} flex items-center justify-center relative p-3 border-b border-bloxborder">
+            <span class="text-5xl select-none group-hover:scale-110 transition-transform duration-300 drop-shadow-md">
+              ${item.image}
+            </span>
+            <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+              <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-black/60 backdrop-blur-md text-slate-200 border border-white/10 uppercase tracking-wider">
+                ${categories.find(c => c.id === item.category)?.name || 'Roblox'}
+              </span>
+            </div>
+            ${item.fastDelivery ? `
+              <div class="absolute top-2.5 right-2.5">
+                <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1">
+                  <i data-lucide="zap" class="w-3 h-3"></i> ${item.deliveryTime}
+                </span>
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- Card Body -->
+          <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+            <div>
+              <span class="inline-block text-[11px] font-medium text-red-400 mb-1">
+                #${item.badge}
+              </span>
+              <h3 class="font-bold text-sm text-white line-clamp-2 leading-snug group-hover:text-red-400 transition-colors">
+                ${item.title}
+              </h3>
+            </div>
+
+            <!-- Seller Info -->
+            <div class="pt-2 border-t border-bloxborder/60 flex items-center justify-between text-xs text-slate-400">
+              <div class="flex items-center gap-1.5 truncate">
+                <span class="font-semibold text-slate-200 truncate">${item.seller}</span>
+                ${item.verified ? `
+                  <i data-lucide="badge-check" class="w-3.5 h-3.5 text-blue-400 shrink-0" title="Onaylı Roblox Satıcısı"></i>
+                ` : ''}
+              </div>
+              <div class="flex items-center gap-1 font-mono text-amber-400 font-bold shrink-0">
+                <i data-lucide="star" class="w-3 h-3 fill-amber-400"></i>
+                <span>${item.sellerRating.toFixed(1)}</span>
+                <span class="text-slate-500 text-[10px]">(${item.sellerSales})</span>
+              </div>
+            </div>
+
+            <!-- Price & Buy Button -->
+            <div class="pt-2 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-slate-500 block">Fiyat</span>
+                <span class="text-lg font-black text-white font-mono tracking-tight">₺${item.price.toFixed(2)}</span>
+              </div>
+              <button onclick="initiateBuy(${item.id})" class="px-3.5 py-2 bg-red-600 hover:bg-red-500 active:scale-95 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-red-600/20 flex items-center gap-1.5">
+                <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i>
+                <span>Satın Al</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function handleSearch(val) {
+      searchQuery = val;
+      renderListings();
+    }
+
+    function toggleFastDeliveryFilter() {
+      filterFastDelivery = !filterFastDelivery;
+      const btn = document.getElementById('fastDeliveryFilterBtn');
+      if (filterFastDelivery) {
+        btn.classList.add('bg-amber-500/20', 'border-amber-500', 'text-amber-300');
+        btn.classList.remove('bg-bloxcard', 'text-slate-300');
+      } else {
+        btn.classList.remove('bg-amber-500/20', 'border-amber-500', 'text-amber-300');
+        btn.classList.add('bg-bloxcard', 'text-slate-300');
+      }
+      renderListings();
+    }
+
+    function handleSort(val) {
+      currentSort = val;
+      renderListings();
+    }
+
+    function resetFilters() {
+      selectedCategory = 'all';
+      searchQuery = '';
+      filterFastDelivery = false;
+      document.getElementById('searchInput').value = '';
+      initCategories();
+      const btn = document.getElementById('fastDeliveryFilterBtn');
+      btn.classList.remove('bg-amber-500/20', 'border-amber-500', 'text-amber-300');
+      btn.classList.add('bg-bloxcard', 'text-slate-300');
+      renderListings();
+    }
+
+    function openModal(modalId) {
+      const m = document.getElementById(modalId);
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeModal(modalId) {
+      const m = document.getElementById(modalId);
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function initiateBuy(id) {
+      const item = listings.find(i => i.id === id);
+      if (!item) return;
+      activeBuyingItem = item;
+
+      // Fill modal details
+      document.getElementById('buyModalItemDetails').innerHTML = `
+        <div class="flex items-center gap-3">
+          <span class="text-3xl">${item.image}</span>
+          <div>
+            <h4 class="font-bold text-white text-xs line-clamp-1">${item.title}</h4>
+            <div class="text-[11px] text-slate-400 mt-0.5">Satıcı: <span class="text-slate-200 font-semibold">${item.seller}</span> (${item.deliveryTime})</div>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="text-xs text-slate-400 block">Tutar</span>
+          <span class="font-mono font-bold text-emerald-400 text-sm">₺${item.price.toFixed(2)}</span>
+        </div>
+      `;
+      document.getElementById('buyModalPriceTag').innerText = `₺${item.price.toFixed(2)}`;
+      document.getElementById('buyerRobloxUser').value = '';
+
+      openModal('buyModal');
+    }
+
+    function executePurchase() {
+      const robloxNick = document.getElementById('buyerRobloxUser').value.trim();
+      if (!robloxNick) {
+        showToast('Lütfen Roblox kullanıcı adınızı girin!', 'error');
+        return;
+      }
+
+      if (userBalance < activeBuyingItem.price) {
+        showToast('Yetersiz Bakiye! Üst kısımdan bakiye ekleyebilirsiniz.', 'error');
+        return;
+      }
+
+      // Deduct balance and simulate escrow hold
+      userBalance -= activeBuyingItem.price;
+      updateBalanceUI();
+
+      closeModal('buyModal');
+      showToast('₺' + activeBuyingItem.price.toFixed(2) + ' emanet havuzuna aktarıldı! Sipariş açıldı.', 'success');
+
+      // Launch simulated live chat with seller
+      launchSellerChat(activeBuyingItem, robloxNick);
+    }
+
+    function updateBalanceUI() {
+      document.getElementById('userBalanceText').innerText = `₺${userBalance.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    function addMockFunds() {
+      userBalance += 250;
+      updateBalanceUI();
+      showToast('Hesabınıza ₺250.00 test bakiyesi eklendi!', 'success');
+    }
+
+    function handleCreateListing(e) {
+      e.preventDefault();
+      const title = document.getElementById('newTitle').value.trim();
+      const category = document.getElementById('newCategory').value;
+      const price = parseFloat(document.getElementById('newPrice').value);
+      const seller = document.getElementById('newSeller').value.trim();
+      const deliveryTime = document.getElementById('newDelivery').value;
+      const badge = document.getElementById('newBadge').value.trim() || 'Hızlı İlan';
+
+      const emojiMap = {
+        robux: '🪙',
+        fruits: '🍎',
+        pets: '🐾',
+        mm2: '🔪',
+        accounts: '👤'
+      };
+
+      const newItem = {
+        id: Date.now(),
+        title,
+        category,
+        price,
+        seller,
+        sellerRating: 5.0,
+        sellerSales: 1,
+        verified: true,
+        fastDelivery: deliveryTime.includes('Anında'),
+        deliveryTime,
+        badge,
+        image: emojiMap[category] || '🎮',
+        bgGradient: 'from-red-600/20 to-purple-600/10'
+      };
+
+      listings.unshift(newItem);
+      renderListings();
+      closeModal('createModal');
+      document.getElementById('listingForm').reset();
+      showToast('İlanınız başarıyla yayına alındı!', 'success');
+    }
+
+    let currentChatSeller = '';
+    function launchSellerChat(item, buyerNick) {
+      currentChatSeller = item.seller;
+      document.getElementById('chatSellerName').innerText = item.seller;
+      document.getElementById('chatSellerAvatar').innerText = item.seller.substring(0, 1).toUpperCase();
+
+      const chatBox = document.getElementById('chatMessages');
+      chatBox.innerHTML = `
+        <div class="p-2.5 rounded-lg bg-blue-950/40 border border-blue-900/50 text-[11px] text-blue-200">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 inline mr-1 text-emerald-400"></i>
+          <strong>Emanet Koruması:</strong> Alıcı ödemesi havuzda kilitlendi. Satıcı teslimatı tamamlayana kadar güvendesiniz.
+        </div>
+        <div class="bg-bloxcard border border-bloxborder p-2 rounded-xl text-slate-200 max-w-[85%]">
+          Merhaba! <strong>${item.title}</strong> siparişiniz alındı. Roblox kullanıcı adınız: <span class="text-amber-400 font-bold">${buyerNick}</span>. Seni oyuna davet ediyorum, lütfen isteği kabul et!
+        </div>
+      `;
+      lucide.createIcons();
+      toggleChatDrawer(true);
+
+      // Automated seller reply simulated after 4 seconds
+      setTimeout(() => {
+        appendSellerMessage(`Takas isteği gönderdim (${item.seller}), oyuna gelip kabul edebilirsin! Teslim alınca lütfen buradan onayla.`);
+      }, 4000);
+    }
+
+    function toggleChatDrawer(show) {
+      const drawer = document.getElementById('chatDrawer');
+      if (show) {
+        drawer.classList.remove('hidden');
+        drawer.classList.add('flex');
+      } else {
+        drawer.classList.add('hidden');
+        drawer.classList.remove('flex');
+      }
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const val = input.value.trim();
+      if (!val) return;
+
+      const chatBox = document.getElementById('chatMessages');
+      const msg = document.createElement('div');
+      msg.className = 'bg-red-600 text-white p-2 rounded-xl text-slate-100 max-w-[85%] ml-auto text-right';
+      msg.innerText = val;
+      chatBox.appendChild(msg);
+      input.value = '';
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function appendSellerMessage(text) {
+      const chatBox = document.getElementById('chatMessages');
+      const msg = document.createElement('div');
+      msg.className = 'bg-bloxcard border border-bloxborder p-2 rounded-xl text-slate-200 max-w-[85%]';
+      msg.innerHTML = `<span class="text-[10px] text-slate-400 block">${currentChatSeller}</span>` + text;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function confirmDeliveryEscrow() {
+      showToast('Tebrikler! Sipariş onaylandı, tutar satıcıya aktarıldı.', 'success');
+      appendSellerMessage('Teşekkür ederim! Harika bir alışverişti, iyi oyunlar!');
+    }
+
+    /* Toast Helper */
+    function showToast(message, type = 'info') {
+      const t = document.getElementById('toast');
+      t.innerText = message;
+      t.className = 'fixed top-5 right-5 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold border';
+
+      if (type === 'success') {
+        t.classList.add('bg-emerald-950', 'text-emerald-300', 'border-emerald-600');
+      } else if (type === 'error') {
+        t.classList.add('bg-red-950', 'text-red-300', 'border-red-600');
+      } else {
+        t.classList.add('bg-blue-950', 'text-blue-300', 'border-blue-600');
+      }
+
+      t.classList.remove('hidden');
+      setTimeout(() => {
+        t.classList.add('hidden');
+      }, 3500);
+    }
+
+    // Initial Boot
+    window.addEventListener('DOMContentLoaded', () => {
+      initCategories();
+      renderListings();
+      updateBalanceUI();
+    });
+  </script>
+</body>
+</html>
